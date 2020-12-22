@@ -13,8 +13,4 @@
     <ProjectReference Include="..\JDKDownloader.Core\JDKDownloader.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CMDArgs\" />
-  </ItemGroup>
-
 </Project>
