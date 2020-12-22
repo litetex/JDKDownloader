@@ -6,7 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AdoptOpenJDKDownloader.Core\JDKDownloader.Core.csproj" />
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\JDKDownloader.Core\JDKDownloader.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CMDArgs\" />
   </ItemGroup>
 
 </Project>
