@@ -1,2 +1,2 @@
-# AdoptOpenJDKDownloader
-Downloads jdks from AdoptOpenJDK
+# JDKDownloader
+Downloads jdks/jres

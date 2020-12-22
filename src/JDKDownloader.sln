@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JDKDownloader", "JDKDownloader\JDKDownloader.csproj", "{C43D3CB2-878C-4EE5-A98A-33B72A67C45A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JDKDownloader.Core", "JDKDownloader.Core\JDKDownloader.Core.csproj", "{F293614C-33BB-48DC-BD7D-3005C505A689}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD371808-6B61-4C31-910F-052E3BB25BD0}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C43D3CB2-878C-4EE5-A98A-33B72A67C45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C43D3CB2-878C-4EE5-A98A-33B72A67C45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C43D3CB2-878C-4EE5-A98A-33B72A67C45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C43D3CB2-878C-4EE5-A98A-33B72A67C45A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F293614C-33BB-48DC-BD7D-3005C505A689}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F293614C-33BB-48DC-BD7D-3005C505A689}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F293614C-33BB-48DC-BD7D-3005C505A689}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F293614C-33BB-48DC-BD7D-3005C505A689}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09BDC96D-DFE2-43BD-A624-FF0A7232FD10}
+	EndGlobalSection
+EndGlobal
