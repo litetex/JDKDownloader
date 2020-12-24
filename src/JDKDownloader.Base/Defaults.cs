@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JDKDownloader.Core
+namespace JDKDownloader.Base
 {
    public static class Defaults
    {
-      public const int DEFAULT_JAVA_VERSION = 11;
+      public const int DEFAULT_JAVA_FEATURE_VERSION = 11;
    }
 }

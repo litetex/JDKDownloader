@@ -1,4 +1,7 @@
-﻿using System;
+﻿using JDKDownloader.Core;
+using JDKDownloader.Provider.AdoptOpenJDK;
+using JDKDownloader.Provider.AdoptOpenJDK.Config;
+using System;
 
 namespace JDKDownloader
 {
@@ -6,7 +9,12 @@ namespace JDKDownloader
    {
       static void Main(string[] args)
       {
-         Console.WriteLine("Hello World!");
+         var config = new AdoptOpenJDKConfig()
+         {
+
+         };
+
+         JdkDownloader.Download<AdoptOpenJDK,AdoptOpenJDKConfig>(config);
       }
    }
 }

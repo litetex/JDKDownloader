@@ -1,14 +1,24 @@
-﻿using System;
+﻿using JDKDownloader.Base;
+using JDKDownloader.Base.Provider;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace JDKDownloader.Core.Config
+namespace JDKDownloader.Provider.AdoptOpenJDK.Config
 {
    /// <seealso cref="https://api.adoptopenjdk.net/swagger-ui/#/Assets/get_v3_assets_feature_releases__feature_version___release_type_"/>
-   public class AdoptOpenJDKConfig
+   public class AdoptOpenJDKConfig : IJdkProviderConfig
    {
       public const string DEFAULT_BASE_URL = "https://api.adoptopenjdk.net/v3/assets/feature_releases/{feature_version}/{release_type}";
-      public const int DEFAULT_FEATURE_VERSION = Defaults.DEFAULT_JAVA_VERSION;
+      public const int DEFAULT_FEATURE_VERSION = Defaults.DEFAULT_JAVA_FEATURE_VERSION;
+      public const string DEFAULT_REALEASE_TYPE = "ga";
+      public const string DEFAULT_HEAP_SIZE = "normal";
+      public const string DEFAULT_IMAGE_TYPE = "jdk";
+      public const string DEFAULT_JVM_IMPL = "hotspot";
+      public const int DEFAULT_PAGE_SIZE = 1;
+      public const string DEFAULT_PROJECT = "jdk";
+      public const string DEFAULT_SORT_ORDER = "DESC";
+      public const string DEFAULT_VENDOR = "adoptopenjdk";
 
       /// <summary>
       /// Remote URL
@@ -35,7 +45,7 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// ea, ga
       /// </example>
-      public string ReleaseType { get; set; } = "ga";
+      public string ReleaseType { get; set; } = DEFAULT_REALEASE_TYPE;
 
       /// <summary>
       /// Architecture; if null: automatically detected
@@ -57,7 +67,7 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// normal, large
       /// </example>
-      public string HeapSize { get; set; } = "normal";
+      public string HeapSize { get; set; } = DEFAULT_HEAP_SIZE;
 
       /// <summary>
       /// ImageType
@@ -68,7 +78,7 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// jdk, jre, testimage
       /// </example>
-      public string ImageType { get; set; } = "jdk";
+      public string ImageType { get; set; } = DEFAULT_IMAGE_TYPE;
 
       /// <summary>
       /// JVM Implementation
@@ -79,7 +89,7 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// hotspot, openj9
       /// </example>
-      public string JVMImpl { get; set; } = "hotspot";
+      public string JVMImpl { get; set; } = DEFAULT_JVM_IMPL;
 
       /// <summary>
       /// Operating System; if null: automatically detected
@@ -98,7 +108,7 @@ namespace JDKDownloader.Core.Config
       /// <remarks>
       /// page_size
       /// </remarks>
-      public int PageSize { get; set; } = 1;
+      public int PageSize { get; set; } = DEFAULT_PAGE_SIZE;
 
       /// <summary>
       /// Project
@@ -109,7 +119,7 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// jdk, valhalla, ...
       /// </example>
-      public string Project { get; set; } = "jdk";
+      public string Project { get; set; } = DEFAULT_PROJECT;
 
       /// <summary>
       /// Sort Order; Use latest with DESC
@@ -120,7 +130,7 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// ASC, DESC
       /// </example>
-      public string SortOrder { get; set; } = "DESC";
+      public string SortOrder { get; set; } = DEFAULT_SORT_ORDER;
 
       /// <summary>
       /// Vendor
@@ -131,6 +141,6 @@ namespace JDKDownloader.Core.Config
       /// <example>
       /// jdk, valhalla, ...
       /// </example>
-      public string Vendor { get; set; } = "adoptopenjdk";
+      public string Vendor { get; set; } = DEFAULT_VENDOR;
    }
 }

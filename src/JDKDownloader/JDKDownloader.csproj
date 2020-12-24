@@ -11,6 +11,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\JDKDownloader.Core\JDKDownloader.Core.csproj" />
+    <ProjectReference Include="..\JDKDownloader.Provider.AdoptOpenJDK\JDKDownloader.Provider.AdoptOpenJDK.csproj" />
   </ItemGroup>
 
 </Project>
