@@ -11,5 +11,9 @@ namespace JDKDownloader.CMDOptions
    {
       [Value(0)]
       public IEnumerable<string> SubArgs { get; set; }
+
+
+      [Option("non-interactive", HelpText = "Will not show dynamic stuff, like download progress on the console")]
+      public bool NonInteractive { get; set; }
    }
 }

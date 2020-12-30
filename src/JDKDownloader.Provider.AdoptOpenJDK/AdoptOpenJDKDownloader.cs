@@ -145,7 +145,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
 
       private void ExtractToOutputDir(string packedFile)
       {
-         var tempDir = "temp-" + DownloadConfig.OutputDir;
+         var tempDir = Path.Combine(DownloadConfig.OutputDir, $"temp-{Path.GetFileName(packedFile)}");
 
          if (Directory.Exists(tempDir))
             Directory.Delete(tempDir, true);
