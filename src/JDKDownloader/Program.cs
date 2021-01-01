@@ -1,5 +1,4 @@
-﻿using JDKDownloader.Base.Download;
-using JDKDownloader.Core;
+﻿using JDKDownloader.Core;
 using JDKDownloader.Provider.AdoptOpenJDK;
 using JDKDownloader.Provider.AdoptOpenJDK.Config;
 using System;
@@ -20,7 +19,7 @@ namespace JDKDownloader
             OutputDir = "output",
          };
 
-         JdkDownloader.Download<AdoptOpenJDK,AdoptOpenJDKConfig>(config, dwlConfig);
+         JdkDownloader.Download<AdoptOpenJDK,AdoptOpenJDKConfig>(config, dwlConfig, new ConsoleDownloadProgressBar());
       }
    }
 }

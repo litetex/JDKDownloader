@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace JDKDownloader.Base.Download
+namespace JDKDownloader
 {
    public class DownloadConfig
    {

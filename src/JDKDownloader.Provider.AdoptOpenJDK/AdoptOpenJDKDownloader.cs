@@ -1,4 +1,4 @@
-﻿using JDKDownloader.Base.Download;
+﻿using CoreFramework.Base.IO;
 using JDKDownloader.Base.Provider;
 using JDKDownloader.Base.Util;
 using JDKDownloader.Base.Util.Download;
@@ -12,6 +12,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace JDKDownloader.Provider.AdoptOpenJDK
 {
@@ -30,8 +31,14 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          DownloadConfig = downloadConfig;
       }
 
-      public void Download()
+      public void Download(IProgress<ProgressData> progress = null)
       {
+         progress?.Report(new ProgressData()
+         {
+            Percent = 0,
+            Phase = "Initalizing"
+         });
+
          if (string.IsNullOrWhiteSpace(Config.OS))
             Config.OS = GetOS();
 
@@ -40,11 +47,23 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
 
          using var wc = new WebClient();
 
+         progress?.Report(new ProgressData()
+         {
+            Percent = 0,
+            Phase = "Fetching metadata"
+         });
+
          var downloadMetaUri = GetDownloadURI();
 
          Log.Info($"Downloading metadata from '{downloadMetaUri}'");
 
          var metaJSON = wc.DownloadString(downloadMetaUri);
+
+         progress?.Report(new ProgressData()
+         {
+            Percent = 0,
+            Phase = "Processing metadata"
+         });
 
          Log.Info($"Download successful");
          Log.Debug($"Got this: {metaJSON}");
@@ -70,9 +89,93 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
 
          var downloadLocation = DownloadConfig.UseTemp ? Path.Combine(Path.GetTempPath(), name) : name;
 
-         CheckSumDownloader.SHA256.RunDownloadAsync(link, downloadLocation, size, DownloadConfig.PerformCheckSumCheck ? sha256checksum : null).Wait();
+         progress?.Report(new ProgressData()
+         {
+            Percent = 0,
+            Phase = "Downloading JDK"
+         });
+
+
+         RetryDownloadProgress latestProgress = null;        
+
+         var dwlProgress = new ProgressActionRelay<RetryDownloadProgress>(p => latestProgress = p);
+
+         var lastReportedTime = DateTimeOffset.UtcNow;
+         RetryDownloadProgress lastProgress = null;
+         var lastBytesPerSec = new FixedSizedQueue<long>(50);
+
+         var timer = new Timer()
+         {
+            AutoReset = true,
+            Interval = 100,
+         };
+         timer.Elapsed += (s, ev) =>
+         {
+            try
+            {
+               var now = DateTimeOffset.UtcNow;
+
+               var currentProgress = latestProgress;
+               if (currentProgress != null)
+               {
+                  if (currentProgress?.DownloadData != null)
+                  {
+                     var secDiff = (now - lastReportedTime).TotalSeconds;
+
+                     // Ignore values that are to small and cause inaccurate calculations
+                     if (secDiff > 0.01)
+                     {
+                        var receivedBytesDelta = Math.Max(currentProgress.DownloadData.DownloadBytesReceived - lastProgress?.DownloadData?.DownloadBytesReceived ?? 0, 0);
+                        var bytesPerSecond = Math.Max((long)Math.Round(receivedBytesDelta / secDiff), 0);
+                        lastBytesPerSec.Enqueue(bytesPerSecond);
+                     }
+                  }
+                  else
+                  {
+                     lastBytesPerSec.Clear();
+                  }
+
+                  progress?.Report(new ProgressData()
+                  {
+                     Percent = currentProgress.DownloadData?.DownloadProgressPercentage / 100 ?? 0,
+                     Phase = $"Downloading JDK; Try #{currentProgress.AttemptNumber} - {latestProgress.Step}",
+                     DownloadSpeedBytePerSecond = lastBytesPerSec.IsEmpty ? 0 : (long)Math.Round(lastBytesPerSec.Average()),
+                  });
+
+                  lastProgress = currentProgress;
+               }
+
+               lastReportedTime = now;
+            }
+            catch (Exception ex)
+            {
+               Log.Error(ex);
+            }
+         };
+
+         if(progress != null)
+            timer.Start();
+
+         CheckSumDownloader.SHA256.RunDownloadAsync(link, downloadLocation, size, DownloadConfig.PerformCheckSumCheck ? sha256checksum : null, progress: dwlProgress).Wait();
+
+         if(progress != null)
+            timer.Stop();
+
+         timer.Dispose();
+
+         progress?.Report(new ProgressData()
+         {
+            Percent = 1,
+            Phase = "Extracting"
+         });
 
          ExtractToOutputDir(downloadLocation);
+
+         progress?.Report(new ProgressData()
+         {
+            Percent = 1,
+            Phase = "Done"
+         });
       }
 
 
@@ -147,10 +250,8 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
       {
          var tempDir = Path.Combine(DownloadConfig.OutputDir, $"temp-{Path.GetFileName(packedFile)}");
 
-         if (Directory.Exists(tempDir))
-            Directory.Delete(tempDir, true);
-
-         Directory.CreateDirectory(tempDir);
+         DirUtil.EnsureCreatedAndClean(DownloadConfig.OutputDir);
+         DirUtil.EnsureCreatedAndClean(tempDir);
 
          Log.Info($"Extracting '{packedFile}'->'{tempDir}'");
          if (packedFile.EndsWith(".zip"))
@@ -180,7 +281,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          foreach (var dir in new DirectoryInfo(tempDir).GetDirectories())
          {
             Log.Info($"Moving internal (layer-1) directory '{dir}' into '{targetInfo}'");
-            IOUtil.CopyFilesRecursively(dir, targetInfo);
+            DirUtil.Copy(dir, targetInfo);
 
             deleteTasks.Add(
                   Task.Run(() =>
@@ -192,13 +293,13 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
                );
          }
 
-         Log.Info($"Deleting tempfolder '{tempDir}'");
-         Directory.Delete(tempDir, true);
-         Log.Info($"Deleted '{tempDir}'");
-
          Log.Info("Waiting for DeleteTasks");
          Task.WaitAll(deleteTasks.ToArray());
          Log.Info("All DeleteTasks finished");
+
+         Log.Info($"Deleting tempfolder '{tempDir}'");
+         Directory.Delete(tempDir, true);
+         Log.Info($"Deleted '{tempDir}'");
 
          Log.Info("Extracting finished");
       }

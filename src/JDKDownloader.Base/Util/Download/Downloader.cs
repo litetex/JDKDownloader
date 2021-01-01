@@ -12,7 +12,7 @@ namespace JDKDownloader.Base.Util.Download
 {
    public static class Downloader
    {
-      public static void Download(string srcURL, string targetPath)
+      public static async Task Download(string srcURL, string targetPath, Action<DownloadProgressChangedEventArgs> onDownloadProgressChanged = null)
       {
          Log.Info($"Starting download: '{srcURL}'->'{targetPath}'");
 
@@ -20,7 +20,10 @@ namespace JDKDownloader.Base.Util.Download
 
          //Webclient overrides existing files
          using (var webclient = new WebClient())
-            webclient.DownloadFile(srcURL, targetPath);
+         {
+            webclient.DownloadProgressChanged += (s, ev) => onDownloadProgressChanged?.Invoke(ev);
+            await webclient.DownloadFileTaskAsync(srcURL, targetPath);
+         }
 
          sw.Stop();
          Log.Info($"Downloading from '{srcURL}' took {sw.ElapsedMilliseconds}ms");
