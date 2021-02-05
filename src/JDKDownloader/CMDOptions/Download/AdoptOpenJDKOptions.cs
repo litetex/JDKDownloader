@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using JDKDownloader.Provider.AdoptOpenJDK.Config;
+using JDKDownloader.Provider.AdoptOpenJDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;

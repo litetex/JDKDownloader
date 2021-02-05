@@ -1,12 +1,15 @@
 ﻿using JDKDownloader.Base;
-using JDKDownloader.Base.Provider;
+using JDKDownloader.Provider;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace JDKDownloader.Provider.AdoptOpenJDK.Config
+
+namespace JDKDownloader.Provider.AdoptOpenJDK
 {
-   /// <seealso cref="https://api.adoptopenjdk.net/swagger-ui/#/Assets/get_v3_assets_feature_releases__feature_version___release_type_"/>
+   /// <summary>
+   /// Configuration for <see cref="AdoptOpenJDKProvider"/> <seealso cref="https://api.adoptopenjdk.net/swagger-ui/#/Assets/get_v3_assets_feature_releases__feature_version___release_type_"/>
+   /// </summary>
    public class AdoptOpenJDKConfig : IJdkProviderConfig
    {
       public const string DEFAULT_BASE_URL = "https://api.adoptopenjdk.net/v3/assets/feature_releases/{feature_version}/{release_type}";

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "JDKDownloader": {
+      "commandName": "Project",
+      "commandLineArgs": "download adoptopenjdk --outputdirectory=Output --imagetype=jre --loglevel=warning"
+    }
+  }
+}

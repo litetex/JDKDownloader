@@ -1,4 +1,4 @@
-﻿using JDKDownloader.Base.Provider;
+﻿using JDKDownloader.Provider;
 using System;
 using System.Collections.Generic;
 using System.Text;

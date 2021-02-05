@@ -10,16 +10,16 @@ namespace JDKDownloader
       /// <summary>
       /// Specifies the the directory, where the content should be downloaded into; Default = current dur
       /// </summary>
-      public string OutputDir { get; set; } = Directory.GetCurrentDirectory();
+      public virtual string OutputDir { get; set; } = Directory.GetCurrentDirectory();
 
       /// <summary>
       /// Perform a checksum check
       /// </summary>
-      public bool PerformCheckSumCheck { get; set; } = true;
+      public virtual bool PerformCheckSumCheck { get; set; } = true;
 
       /// <summary>
       /// Use the tempdir for downloading
       /// </summary>
-      public bool UseTemp { get; set; } = false;
+      public virtual bool UseTemp { get; set; } = false;
    }
 }

@@ -1,4 +1,4 @@
-﻿using JDKDownloader.Base.Provider;
+﻿using JDKDownloader.Provider;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,9 +13,10 @@ namespace JDKDownloader.Core
       {
          P instance = (P)Activator.CreateInstance(typeof(P));
 
-         var downloader = instance.JDKDownloader;
+         var downloader = instance.JDKDownloaderSupplier();
          downloader.UseConfig(config);
-         downloader.UseDownloadConfig(downloadConfig ?? new DownloadConfig());
+         if(downloadConfig != null)
+            downloader.UseDownloadConfig(downloadConfig);
 
          downloader.Download(progress);
       }

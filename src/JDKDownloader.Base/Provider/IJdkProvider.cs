@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JDKDownloader.Base.Provider
+namespace JDKDownloader.Provider
 {
    public interface IJdkProvider<in C> where C : IJdkProviderConfig
    {
-      IJdkDownloader<C> JDKDownloader { get; }
+      Func<IJdkDownloader<C>> JDKDownloaderSupplier { get; }
    }
 }

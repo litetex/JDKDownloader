@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JDKDownloader.Base.Provider
+namespace JDKDownloader.Provider
 {
    public class ProgressData
    {

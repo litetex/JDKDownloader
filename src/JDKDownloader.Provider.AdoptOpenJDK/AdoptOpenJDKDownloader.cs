@@ -1,11 +1,11 @@
 ﻿using CoreFramework.Base.IO;
-using JDKDownloader.Base.Provider;
+using JDKDownloader.Provider;
 using JDKDownloader.Base.Util;
 using JDKDownloader.Base.Util.Download;
-using JDKDownloader.Provider.AdoptOpenJDK.Config;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,19 +16,30 @@ using System.Timers;
 
 namespace JDKDownloader.Provider.AdoptOpenJDK
 {
+   /// <summary>
+   /// Downloader for <see cref="https://adoptopenjdk.net/"/>
+   /// </summary>
    public class AdoptOpenJDKDownloader : IJdkDownloader<AdoptOpenJDKConfig>
    {
-      private AdoptOpenJDKConfig Config { get; set; }
-      private DownloadConfig DownloadConfig { get; set; }
+      protected AdoptOpenJDKConfig Config { get; set; } = new AdoptOpenJDKConfig();
+      protected DownloadConfig DownloadConfig { get; set; } = new DownloadConfig();
+
+      public AdoptOpenJDKDownloader(AdoptOpenJDKConfig config = null, DownloadConfig downloadConfig = null)
+      {
+         if (config != null)
+            UseConfig(config);
+         if (downloadConfig != null)
+            UseDownloadConfig(downloadConfig);
+      }
 
       public void UseConfig(AdoptOpenJDKConfig config)
       {
-         Config = config;
+         Config = config ?? throw new ArgumentNullException(nameof(config));
       }
 
       public void UseDownloadConfig(DownloadConfig downloadConfig)
       {
-         DownloadConfig = downloadConfig;
+         DownloadConfig = downloadConfig ?? throw new ArgumentNullException(nameof(downloadConfig));
       }
 
       public void Download(IProgress<ProgressData> progress = null)
@@ -151,9 +162,25 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          if(progress != null)
             timer.Start();
 
+         EventHandler cleanUpHandler = (s, ev) =>
+         {
+            try
+            {
+               if (File.Exists(downloadLocation))
+                  File.Delete(downloadLocation);
+            }
+            catch (Exception e)
+            {
+               Console.Error.WriteLine(e);
+            }
+         };
+         AppDomain.CurrentDomain.ProcessExit += cleanUpHandler;
+
          CheckSumDownloader.SHA256.RunDownloadAsync(link, downloadLocation, size, DownloadConfig.PerformCheckSumCheck ? sha256checksum : null, progress: dwlProgress).Wait();
 
-         if(progress != null)
+         AppDomain.CurrentDomain.ProcessExit -= cleanUpHandler;
+
+         if (progress != null)
             timer.Stop();
 
          timer.Dispose();
