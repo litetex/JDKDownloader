@@ -12,5 +12,17 @@ namespace JDKDownloader.CMDOptions
    {
       [Value(0)]
       public IEnumerable<string> SubArgs { get; set; }
+
+      [Option('o', "outputdirectory", HelpText = "Specifies the output directory; if not set = current working directory")]
+      public string OutputDirectory { get; set; }
+
+      [Option("noCheckSumCheck", HelpText = "Perform NO checksum check against the remote server; Be careful")]
+      public bool NoCheckSumCheck { get; set; }
+
+      /// <remarks>
+      /// May downgrade performance if enabled e.g. when using multiple harddrives: %TEMPDIR% is located on Disk1, but the files should be extracted to Disk2
+      /// </remarks>
+      [Option("useTemp", HelpText = "Uses the system specfic tempdir")]
+      public bool UseTempDir { get; set; }
    }
 }

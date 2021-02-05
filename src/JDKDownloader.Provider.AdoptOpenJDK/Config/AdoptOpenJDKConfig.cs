@@ -23,7 +23,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <summary>
       /// Remote URL
       /// </summary>
-      public string RemoteBaseURL { get; set; } = DEFAULT_BASE_URL;
+      public virtual string RemoteBaseURL { get; set; } = DEFAULT_BASE_URL;
 
       /// <summary>
       /// Version
@@ -34,7 +34,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// 8, ... 11, 12, ...
       /// </example>
-      public int FeatureVersion { get; set; } = DEFAULT_FEATURE_VERSION;
+      public virtual int FeatureVersion { get; set; } = DEFAULT_FEATURE_VERSION;
 
       /// <summary>
       /// ReleaseType
@@ -45,7 +45,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// ea, ga
       /// </example>
-      public string ReleaseType { get; set; } = DEFAULT_REALEASE_TYPE;
+      public virtual string ReleaseType { get; set; } = DEFAULT_REALEASE_TYPE;
 
       /// <summary>
       /// Architecture; if null: automatically detected
@@ -56,7 +56,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// x64, arm, x86
       /// </example>
-      public string Architecture { get; set; } = null;
+      public virtual string Architecture { get; set; } = null;
 
       /// <summary>
       /// HeapSize
@@ -67,7 +67,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// normal, large
       /// </example>
-      public string HeapSize { get; set; } = DEFAULT_HEAP_SIZE;
+      public virtual string HeapSize { get; set; } = DEFAULT_HEAP_SIZE;
 
       /// <summary>
       /// ImageType
@@ -78,7 +78,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// jdk, jre, testimage
       /// </example>
-      public string ImageType { get; set; } = DEFAULT_IMAGE_TYPE;
+      public virtual string ImageType { get; set; } = DEFAULT_IMAGE_TYPE;
 
       /// <summary>
       /// JVM Implementation
@@ -89,7 +89,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// hotspot, openj9
       /// </example>
-      public string JVMImpl { get; set; } = DEFAULT_JVM_IMPL;
+      public virtual string JVMImpl { get; set; } = DEFAULT_JVM_IMPL;
 
       /// <summary>
       /// Operating System; if null: automatically detected
@@ -100,7 +100,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// windows, mac, linux, ...
       /// </example>
-      public string OS { get; set; } = null;
+      public virtual string OS { get; set; } = null;
 
       /// <summary>
       /// Pagination page size (number of results)
@@ -108,7 +108,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <remarks>
       /// page_size
       /// </remarks>
-      public int PageSize { get; set; } = DEFAULT_PAGE_SIZE;
+      public virtual int PageSize { get; set; } = DEFAULT_PAGE_SIZE;
 
       /// <summary>
       /// Project
@@ -119,7 +119,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// jdk, valhalla, ...
       /// </example>
-      public string Project { get; set; } = DEFAULT_PROJECT;
+      public virtual string Project { get; set; } = DEFAULT_PROJECT;
 
       /// <summary>
       /// Sort Order; Use latest with DESC
@@ -130,7 +130,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// ASC, DESC
       /// </example>
-      public string SortOrder { get; set; } = DEFAULT_SORT_ORDER;
+      public virtual string SortOrder { get; set; } = DEFAULT_SORT_ORDER;
 
       /// <summary>
       /// Vendor
@@ -141,6 +141,6 @@ namespace JDKDownloader.Provider.AdoptOpenJDK.Config
       /// <example>
       /// jdk, valhalla, ...
       /// </example>
-      public string Vendor { get; set; } = DEFAULT_VENDOR;
+      public virtual string Vendor { get; set; } = DEFAULT_VENDOR;
    }
 }

@@ -121,14 +121,9 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
                   if (currentProgress?.DownloadData != null)
                   {
                      var secDiff = (now - lastReportedTime).TotalSeconds;
-
-                     // Ignore values that are to small and cause inaccurate calculations
-                     if (secDiff > 0.01)
-                     {
-                        var receivedBytesDelta = Math.Max(currentProgress.DownloadData.DownloadBytesReceived - lastProgress?.DownloadData?.DownloadBytesReceived ?? 0, 0);
-                        var bytesPerSecond = Math.Max((long)Math.Round(receivedBytesDelta / secDiff), 0);
-                        lastBytesPerSec.Enqueue(bytesPerSecond);
-                     }
+                     var receivedBytesDelta = Math.Max(currentProgress.DownloadData.DownloadBytesReceived - lastProgress?.DownloadData?.DownloadBytesReceived ?? 0, 0);
+                     var bytesPerSecond = Math.Max((long)Math.Round(receivedBytesDelta / secDiff), 0);
+                     lastBytesPerSec.Enqueue(bytesPerSecond);
                   }
                   else
                   {
