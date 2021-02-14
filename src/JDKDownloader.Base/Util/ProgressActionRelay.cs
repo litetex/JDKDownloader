@@ -19,7 +19,12 @@ namespace JDKDownloader.Base.Util
 
       public void Report(T value)
       {
-         OnReport.Invoke(value);
+         OnReport?.Invoke(value);
+      }
+
+      public void Unbind()
+      {
+         OnReport = null;
       }
    }
 }

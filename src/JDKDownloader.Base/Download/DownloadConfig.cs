@@ -18,8 +18,8 @@ namespace JDKDownloader
       public virtual bool PerformCheckSumCheck { get; set; } = true;
 
       /// <summary>
-      /// Use the tempdir for downloading
+      /// Uses the tempdir for downloading; if none is set, the system default directory is used
       /// </summary>
-      public virtual bool UseTemp { get; set; } = false;
+      public virtual string TempDir { get; set; } = null;
    }
 }

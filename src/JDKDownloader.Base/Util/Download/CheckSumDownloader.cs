@@ -6,6 +6,7 @@ using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JDKDownloader.Base.Util.Download
@@ -20,13 +21,14 @@ namespace JDKDownloader.Base.Util.Download
       }
 
       public Task DownloadAsync(
-         string srcURL, 
-         string targetPath, 
-         long size, 
-         bool trykeepExisting, 
-         string checksum = null, 
+         string srcURL,
+         string targetPath,
+         long size,
+         bool trykeepExisting,
+         string checksum = null,
          int retrys = 3,
-         IProgress<RetryDownloadProgress> progress = null)
+         IProgress<RetryDownloadProgress> progress = null,
+         CancellationTokenSource cancellationTokenSource = default)
       {
          if (trykeepExisting && File.Exists(targetPath))
          {
@@ -35,24 +37,25 @@ namespace JDKDownloader.Base.Util.Download
             if (!CheckFile(targetPath, size, checksum))
             {
                Log.Info($"Existing file[='{targetPath}'] is faulty! Downloading new one...");
-               return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress);
+               return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress, cancellationTokenSource);
             }
 
             Log.Info($"File[='{targetPath}']'s hash and size are ok! No Download required!");
             return Task.FromResult(0);
          }
 
-         return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress);
+         return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress, cancellationTokenSource);
 
       }
 
       public Task RunDownloadAsync(
-         string srcURL, 
-         string targetPath, 
-         long size, 
-         string checksum = null, 
-         int retrys = 3, 
-         IProgress<RetryDownloadProgress> progress = null)
+         string srcURL,
+         string targetPath,
+         long size,
+         string checksum = null,
+         int retrys = 3,
+         IProgress<RetryDownloadProgress> progress = null,
+         CancellationTokenSource cancellationTokenSource = default)
       {
          return Task.Run(() =>
          {
@@ -66,17 +69,22 @@ namespace JDKDownloader.Base.Util.Download
                   Step = "Starting download",
                });
 
-               Downloader.Download(srcURL, targetPath, ev => progress?.Report(new RetryDownloadProgress()
-               {
-                  AttemptNumber = attemptNumber,
-                  Step = "Downloading",
-                  DownloadData = new DownloadData()
-                  {
-                     DownloadProgressPercentage = ev.ProgressPercentage,
-                     DownloadBytesReceived = ev.BytesReceived,
-                     DownloadTotalBytesToReceive = ev.TotalBytesToReceive
-                  }
-               })).Wait();
+               Downloader
+                  .Download(
+                     srcURL,
+                     targetPath,
+                     cancellationToken: cancellationTokenSource.Token,
+                     onDownloadProgressChanged: ev => progress?.Report(new RetryDownloadProgress()
+                     {
+                        AttemptNumber = attemptNumber,
+                        Step = "Downloading",
+                        DownloadData = new DownloadData()
+                        {
+                           DownloadProgressPercentage = ev.ProgressPercentage,
+                           DownloadBytesReceived = ev.BytesReceived,
+                           DownloadTotalBytesToReceive = ev.TotalBytesToReceive
+                        }
+                     }));
 
                progress?.Report(new RetryDownloadProgress()
                {

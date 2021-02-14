@@ -13,6 +13,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Threading;
+using Timer = System.Timers.Timer;
+using System.Diagnostics;
 
 namespace JDKDownloader.Provider.AdoptOpenJDK
 {
@@ -98,7 +101,16 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          var size = downloadPack["size"].ToObject<int>();
          var sha256checksum = downloadPack["checksum"].ToObject<string>();
 
-         var downloadLocation = DownloadConfig.UseTemp ? Path.Combine(Path.GetTempPath(), name) : name;
+         progress?.Report(new ProgressData()
+         {
+            Percent = 0,
+            Phase = "Preparing download"
+         });
+
+         var tempDir = IOUtil.GenerateTempDir(DownloadConfig.TempDir);
+         Log.Info($"Tempdir is '{tempDir}'");
+
+         var downloadLocation = Path.Combine(tempDir, name);
 
          progress?.Report(new ProgressData()
          {
@@ -162,28 +174,84 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          if(progress != null)
             timer.Start();
 
+         
+         var ctsCancel = new CancellationTokenSource();
+         var tcsCancel = new TaskCompletionSource<bool>();
          EventHandler cleanUpHandler = (s, ev) =>
          {
             try
             {
-               if (File.Exists(downloadLocation))
-                  File.Delete(downloadLocation);
+               timer.Stop();
+               dwlProgress.Unbind();
+               Trace.WriteLine("UNBIND DONE");
+               progress?.Report(new ProgressData()
+               {
+                  Percent = 0,
+                  Phase = "Aborting"
+               });
+               Trace.WriteLine("REPORT ABORT DONE");
+
+               // Release lock on file
+               ctsCancel.Cancel();
+               Trace.WriteLine("CTS SENT");
+
+               tcsCancel.Task.Wait();
+               Trace.WriteLine("TASK DONE");
             }
             catch (Exception e)
             {
+               Trace.Fail(e.ToString());
                Console.Error.WriteLine(e);
             }
          };
          AppDomain.CurrentDomain.ProcessExit += cleanUpHandler;
 
-         CheckSumDownloader.SHA256.RunDownloadAsync(link, downloadLocation, size, DownloadConfig.PerformCheckSumCheck ? sha256checksum : null, progress: dwlProgress).Wait();
+         bool abort = false;
+         try
+         {
+            CheckSumDownloader.SHA256.RunDownloadAsync(
+               link,
+               downloadLocation,
+               size,
+               DownloadConfig.PerformCheckSumCheck ? sha256checksum : null,
+               progress: dwlProgress,
+               cancellationTokenSource: ctsCancel
+               ).Wait();
+         }
+         catch (OperationCanceledException ex)
+         {
+            abort = true;
+            Trace.WriteLine("CANCEL EXEC");
+            Log.Info("Download was aborted", ex);
+            try
+            {
+               Trace.WriteLine("DELETING TEMPDIR");
+               DirUtil.DeleteSafe(tempDir);
+               Trace.WriteLine("DELETED TEMPDIR");
+            }
+            catch(Exception e2)
+            {
+               Trace.WriteLine(e2.ToString());
+            }
+         }
+         catch (Exception ex)
+         {
+            Trace.WriteLine(ex.ToString());
+         }
+         finally
+         {
+            AppDomain.CurrentDomain.ProcessExit -= cleanUpHandler;
 
-         AppDomain.CurrentDomain.ProcessExit -= cleanUpHandler;
+            tcsCancel.TrySetResult(true);
 
-         if (progress != null)
-            timer.Stop();
+            if (progress != null)
+               timer.Stop();
 
-         timer.Dispose();
+            timer.Dispose();
+         }
+
+         if (abort)
+            return;
 
          progress?.Report(new ProgressData()
          {
@@ -191,7 +259,9 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
             Phase = "Extracting"
          });
 
-         ExtractToOutputDir(downloadLocation);
+         ExtractToOutputDir(tempDir, downloadLocation);
+
+         DirUtil.DeleteSafe(tempDir);
 
          progress?.Report(new ProgressData()
          {
@@ -215,19 +285,14 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
 
       protected string GetArch()
       {
-         switch (RuntimeInformation.OSArchitecture)
+         return RuntimeInformation.OSArchitecture switch
          {
-            case Architecture.X64:
-               return "x64";
-            case Architecture.X86:
-               return "x32";
-            case Architecture.Arm:
-               return "arm";
-            case Architecture.Arm64:
-               return "aarch64";
-            default:
-               throw new InvalidOperationException("Could not find runtime arch");
-         }
+            Architecture.X64 => "x64",
+            Architecture.X86 => "x32",
+            Architecture.Arm => "arm",
+            Architecture.Arm64 => "aarch64",
+            _ => throw new InvalidOperationException("Could not find runtime arch"),
+         };
       }
 
       protected Uri GetDownloadURI()
@@ -268,11 +333,10 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          return uri;
       }
 
-      private void ExtractToOutputDir(string packedFile)
+      private void ExtractToOutputDir(string generalTempDir, string packedFile)
       {
-         var tempDir = Path.Combine(DownloadConfig.OutputDir, $"temp-{Path.GetFileName(packedFile)}");
-
-         DirUtil.EnsureCreatedAndClean(DownloadConfig.OutputDir);
+         var tempDir = Path.Combine(generalTempDir, $"temp-{Path.GetFileName(packedFile)}");
+         
          DirUtil.EnsureCreatedAndClean(tempDir);
 
          Log.Info($"Extracting '{packedFile}'->'{tempDir}'");
@@ -299,6 +363,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
                })
          };
 
+         DirUtil.EnsureCreatedAndClean(DownloadConfig.OutputDir);
          var targetInfo = new DirectoryInfo(DownloadConfig.OutputDir);
          foreach (var dir in new DirectoryInfo(tempDir).GetDirectories())
          {
