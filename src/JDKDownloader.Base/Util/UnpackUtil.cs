@@ -65,6 +65,7 @@ namespace JDKDownloader.Base.Util
       /// <param name="destFolder"></param>
       public static void ExtractTGZMinDepth(string gzArchiveName, string destFolder, int mindepth = 0)
       {
+         throw new NotImplementedException();
          //using (var archive = TarArchive.CreateInputTarArchive(zipArchiveName))
          //{
          //   archive.
