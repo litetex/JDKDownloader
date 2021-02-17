@@ -154,7 +154,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
                   progress?.Report(new ProgressData()
                   {
                      Percent = currentProgress.DownloadData?.DownloadProgressPercentage / 100 ?? 0,
-                     Phase = $"Downloading JDK; Try #{currentProgress.AttemptNumber} - {latestProgress.Step}",
+                     Phase = $"Downloading '{name}'; Try #{currentProgress.AttemptNumber} - {latestProgress.Step}",
                      DownloadSpeedBytePerSecond = lastBytesPerSec.IsEmpty ? 0 : (long)Math.Round(lastBytesPerSec.Average()),
                   });
 
