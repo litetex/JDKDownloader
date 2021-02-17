@@ -8,9 +8,9 @@ namespace JDKDownloader
    public class DownloadConfig
    {
       /// <summary>
-      /// Specifies the the directory, where the content should be downloaded into; Default = current dur
+      /// Specifies the the directory, where the content should be downloaded into; Default = workingdir/download
       /// </summary>
-      public virtual string OutputDir { get; set; } = Directory.GetCurrentDirectory();
+      public virtual string OutputDir { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "java");
 
       /// <summary>
       /// Perform a checksum check
@@ -18,8 +18,8 @@ namespace JDKDownloader
       public virtual bool PerformCheckSumCheck { get; set; } = true;
 
       /// <summary>
-      /// Uses the tempdir for downloading; if none is set, the system default directory is used
+      /// Uses the tempdir for downloading; if not set the packed file is downloaded into the outputdir
       /// </summary>
-      public virtual string TempDir { get; set; } = null;
+      public virtual bool UseTempDir { get; set; }
    }
 }

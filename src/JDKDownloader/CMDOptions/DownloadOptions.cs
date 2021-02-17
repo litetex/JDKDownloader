@@ -22,7 +22,7 @@ namespace JDKDownloader.CMDOptions
       /// <remarks>
       /// May downgrade performance if enabled e.g. when using multiple harddrives: %TEMPDIR% is located on Disk1, but the files should be extracted to Disk2
       /// </remarks>
-      [Option("tempDir", Default = ".temp", HelpText = "Location of the tempdir for downloading; if not set the system/user specific Tempdir is used")]
-      public string TempDir { get; set; } = ".temp";
+      [Option("tempDir", HelpText = "Location of the tempdir for downloading; if not set the system/user specific Tempdir is used")]
+      public bool UseTempDir { get; set; }
    }
 }

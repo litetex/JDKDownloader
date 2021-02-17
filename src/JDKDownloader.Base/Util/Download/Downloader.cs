@@ -13,11 +13,10 @@ namespace JDKDownloader.Base.Util.Download
 {
    public static class Downloader
    {
-      public static void Download(
+      public static async Task Download(
          string srcURL,
          string targetPath, 
-         Action<DownloadProgressChangedEventArgs> onDownloadProgressChanged = null, 
-         CancellationToken cancellationToken = default)
+         Action<DownloadProgressChangedEventArgs> onDownloadProgressChanged = null)
       {
          Log.Info($"Starting download: '{srcURL}'->'{targetPath}'");
 
@@ -26,50 +25,9 @@ namespace JDKDownloader.Base.Util.Download
          //Webclient overrides existing files
          using (var webclient = new WebClient())
          {
-            bool downloadCancelled = false;
-
             webclient.DownloadProgressChanged += (s, ev) => onDownloadProgressChanged?.Invoke(ev);
-            webclient.DownloadFileCompleted += (s, ev) =>
-            {
-               downloadCancelled = ev.Cancelled;
-               if (ev.Cancelled || ev.Error != null)
-               {
-                  try
-                  {
-                     Trace.WriteLine("DELETING DOWNLOADED DATA");
-                     File.Delete(targetPath);
-                  }
-                  catch (Exception ex)
-                  {
-                     Trace.Fail(ex.ToString());
-                     Log.Warn("Unable to cleanup", ex);
-                  }
-               }
-            };
-
-            cancellationToken.Register(() =>
-            {
-               try
-               {
-                  webclient.CancelAsync();
-               }
-               catch (Exception ex)
-               {
-                  Log.Warn("Failed to cancel webclient", ex);
-               }
-            });
-
-            try
-            {
-               webclient.DownloadFileTaskAsync(srcURL, targetPath).Wait();
-            }
-            catch(AggregateException ex)
-            {
-               // Do nothing
-            }
-
-            if (downloadCancelled)
-               throw new OperationCanceledException();
+            
+            await webclient.DownloadFileTaskAsync(srcURL, targetPath);
          }
 
          sw.Stop();

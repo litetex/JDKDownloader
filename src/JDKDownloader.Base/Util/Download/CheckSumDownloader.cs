@@ -27,8 +27,7 @@ namespace JDKDownloader.Base.Util.Download
          bool trykeepExisting,
          string checksum = null,
          int retrys = 3,
-         IProgress<RetryDownloadProgress> progress = null,
-         CancellationTokenSource cancellationTokenSource = default)
+         IProgress<RetryDownloadProgress> progress = null)
       {
          if (trykeepExisting && File.Exists(targetPath))
          {
@@ -37,14 +36,14 @@ namespace JDKDownloader.Base.Util.Download
             if (!CheckFile(targetPath, size, checksum))
             {
                Log.Info($"Existing file[='{targetPath}'] is faulty! Downloading new one...");
-               return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress, cancellationTokenSource);
+               return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress);
             }
 
             Log.Info($"File[='{targetPath}']'s hash and size are ok! No Download required!");
             return Task.FromResult(0);
          }
 
-         return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress, cancellationTokenSource);
+         return RunDownloadAsync(srcURL, targetPath, size, checksum, retrys, progress);
 
       }
 
@@ -54,8 +53,7 @@ namespace JDKDownloader.Base.Util.Download
          long size,
          string checksum = null,
          int retrys = 3,
-         IProgress<RetryDownloadProgress> progress = null,
-         CancellationTokenSource cancellationTokenSource = default)
+         IProgress<RetryDownloadProgress> progress = null)
       {
          return Task.Run(() =>
          {
@@ -73,7 +71,6 @@ namespace JDKDownloader.Base.Util.Download
                   .Download(
                      srcURL,
                      targetPath,
-                     cancellationToken: cancellationTokenSource.Token,
                      onDownloadProgressChanged: ev => progress?.Report(new RetryDownloadProgress()
                      {
                         AttemptNumber = attemptNumber,
@@ -84,7 +81,8 @@ namespace JDKDownloader.Base.Util.Download
                            DownloadBytesReceived = ev.BytesReceived,
                            DownloadTotalBytesToReceive = ev.TotalBytesToReceive
                         }
-                     }));
+                     }))
+                  .Wait();
 
                progress?.Report(new RetryDownloadProgress()
                {

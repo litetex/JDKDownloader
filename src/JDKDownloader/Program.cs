@@ -127,12 +127,15 @@ namespace JDKDownloader
          where P : IJdkProvider<C>
       {
          var downloader = provider.JDKDownloaderSupplier();
-         downloader.UseDownloadConfig(new DownloadConfig()
+         var downloadConfig = new DownloadConfig()
          {
-            OutputDir = downloadOptions.OutputDir,
             PerformCheckSumCheck = !downloadOptions.NoCheckSumCheck,
-            TempDir = downloadOptions.TempDir
-         });
+            UseTempDir = downloadOptions.UseTempDir
+         };
+         if(!string.IsNullOrWhiteSpace(downloadOptions.OutputDir))
+            downloadConfig.OutputDir = downloadOptions.OutputDir;
+
+         downloader.UseDownloadConfig(downloadConfig);
          downloader.UseConfig(providerOptions);
 
          downloader.Download(downloadOptions.NonInteractive ? null : new ConsoleDownloadProgressBar());

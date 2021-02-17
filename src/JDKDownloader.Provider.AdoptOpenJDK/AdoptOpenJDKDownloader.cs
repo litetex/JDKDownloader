@@ -107,10 +107,8 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
             Phase = "Preparing download"
          });
 
-         var tempDir = IOUtil.GenerateTempDir(DownloadConfig.TempDir);
-         Log.Info($"Tempdir is '{tempDir}'");
-
-         var downloadLocation = Path.Combine(tempDir, name);
+         var downloadDir = DownloadConfig.OutputDir + "-dwltemp";
+         var downloadLocation = DownloadConfig.UseTempDir ? Path.GetTempFileName() : Path.Combine(downloadDir, name);
 
          progress?.Report(new ProgressData()
          {
@@ -173,101 +171,70 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
 
          if(progress != null)
             timer.Start();
-
-         
-         var ctsCancel = new CancellationTokenSource();
-         var tcsCancel = new TaskCompletionSource<bool>();
-         EventHandler cleanUpHandler = (s, ev) =>
-         {
-            try
-            {
-               timer.Stop();
-               dwlProgress.Unbind();
-               Trace.WriteLine("UNBIND DONE");
-               progress?.Report(new ProgressData()
-               {
-                  Percent = 0,
-                  Phase = "Aborting"
-               });
-               Trace.WriteLine("REPORT ABORT DONE");
-
-               // Release lock on file
-               ctsCancel.Cancel();
-               Trace.WriteLine("CTS SENT");
-
-               tcsCancel.Task.Wait();
-               Trace.WriteLine("TASK DONE");
-            }
-            catch (Exception e)
-            {
-               Trace.Fail(e.ToString());
-               Console.Error.WriteLine(e);
-            }
-         };
-         AppDomain.CurrentDomain.ProcessExit += cleanUpHandler;
-
-         bool abort = false;
          try
          {
-            CheckSumDownloader.SHA256.RunDownloadAsync(
-               link,
-               downloadLocation,
-               size,
-               DownloadConfig.PerformCheckSumCheck ? sha256checksum : null,
-               progress: dwlProgress,
-               cancellationTokenSource: ctsCancel
-               ).Wait();
-         }
-         catch (OperationCanceledException ex)
-         {
-            abort = true;
-            Trace.WriteLine("CANCEL EXEC");
-            Log.Info("Download was aborted", ex);
             try
             {
-               Trace.WriteLine("DELETING TEMPDIR");
-               DirUtil.DeleteSafe(tempDir);
-               Trace.WriteLine("DELETED TEMPDIR");
+               DirUtil.EnsureCreatedAndClean(downloadDir);
+
+               CheckSumDownloader.SHA256.RunDownloadAsync(
+                  link,
+                  downloadLocation,
+                  size,
+                  DownloadConfig.PerformCheckSumCheck ? sha256checksum : null,
+                  progress: dwlProgress
+                  ).Wait();
             }
-            catch(Exception e2)
+            finally
             {
-               Trace.WriteLine(e2.ToString());
+               if (progress != null)
+                  timer.Stop();
+
+               timer.Dispose();
             }
-         }
-         catch (Exception ex)
-         {
-            Trace.WriteLine(ex.ToString());
+
+            progress?.Report(new ProgressData()
+            {
+               Percent = 1,
+               Phase = "Extracting"
+            });
+
+            ExtractToOutputDir(downloadLocation, DownloadConfig.OutputDir);
          }
          finally
          {
-            AppDomain.CurrentDomain.ProcessExit -= cleanUpHandler;
+            progress?.Report(new ProgressData()
+            {
+               Percent = 1,
+               Phase = "Cleanup"
+            });
 
-            tcsCancel.TrySetResult(true);
+            try
+            {
+               if (File.Exists(downloadLocation))
+                  File.Delete(downloadLocation);
+            }
+            catch (Exception ex)
+            {
+               Log.Error("Failed to delete downloaded archive", ex);
+            }
 
-            if (progress != null)
-               timer.Stop();
+            try
+            {
+               if (Directory.Exists(downloadDir))
+                  DirUtil.DeleteSafe(downloadDir);
+            }
+            catch(Exception ex)
+            {
+               Log.Error("Failed to delete downloaddir", ex);
+            }
 
-            timer.Dispose();
+            progress?.Report(new ProgressData()
+            {
+               Percent = 1,
+               Phase = "Done"
+            });
          }
-
-         if (abort)
-            return;
-
-         progress?.Report(new ProgressData()
-         {
-            Percent = 1,
-            Phase = "Extracting"
-         });
-
-         ExtractToOutputDir(tempDir, downloadLocation);
-
-         DirUtil.DeleteSafe(tempDir);
-
-         progress?.Report(new ProgressData()
-         {
-            Percent = 1,
-            Phase = "Done"
-         });
       }
 
 
@@ -333,60 +300,23 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          return uri;
       }
 
-      private void ExtractToOutputDir(string generalTempDir, string packedFile)
+      private void ExtractToOutputDir(string packedFile, string outputdir)
       {
-         var tempDir = Path.Combine(generalTempDir, $"temp-{Path.GetFileName(packedFile)}");
-         
-         DirUtil.EnsureCreatedAndClean(tempDir);
+         DirUtil.EnsureCreatedAndClean(outputdir);
 
-         Log.Info($"Extracting '{packedFile}'->'{tempDir}'");
+         Log.Info($"Extracting '{packedFile}'->'{outputdir}'");
          if (packedFile.EndsWith(".zip"))
          {
             Log.Info("ExtractionMethod: ZIP");
-            UnpackUtil.ExtractZIP(packedFile, tempDir);
+            UnpackUtil.ExtractZIPMinDepth(packedFile, outputdir, 1);
          }
          else if (packedFile.EndsWith(".tar.gz"))
          {
             Log.Info("ExtractionMethod: TAR/GZ");
-            UnpackUtil.ExtractTGZ(packedFile, tempDir);
+            UnpackUtil.ExtractTGZMinDepth(packedFile, outputdir, 1);
          }
          else
             throw new InvalidOperationException("Unknown compression type");
-
-         List<Task> deleteTasks = new List<Task>
-         {
-            Task.Run(() =>
-               {
-                  Log.Info($"Deleting input/tempfile '{packedFile}'");
-                  File.Delete(packedFile);
-                  Log.Info($"Deleted '{packedFile}'");
-               })
-         };
-
-         DirUtil.EnsureCreatedAndClean(DownloadConfig.OutputDir);
-         var targetInfo = new DirectoryInfo(DownloadConfig.OutputDir);
-         foreach (var dir in new DirectoryInfo(tempDir).GetDirectories())
-         {
-            Log.Info($"Moving internal (layer-1) directory '{dir}' into '{targetInfo}'");
-            DirUtil.Copy(dir, targetInfo);
-
-            deleteTasks.Add(
-                  Task.Run(() =>
-                  {
-                     Log.Info($"Deleting internal folder '{dir.FullName}'");
-                     Directory.Delete(dir.FullName, true);
-                     Log.Info($"Deleted '{dir.FullName}'");
-                  })
-               );
-         }
-
-         Log.Info("Waiting for DeleteTasks");
-         Task.WaitAll(deleteTasks.ToArray());
-         Log.Info("All DeleteTasks finished");
-
-         Log.Info($"Deleting tempfolder '{tempDir}'");
-         Directory.Delete(tempDir, true);
-         Log.Info($"Deleted '{tempDir}'");
 
          Log.Info("Extracting finished");
       }
