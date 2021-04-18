@@ -108,7 +108,7 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          });
 
          var downloadDir = DownloadConfig.OutputDir + "-dwltemp";
-         var downloadLocation = DownloadConfig.UseTempDir ? Path.GetTempFileName() : Path.Combine(downloadDir, name);
+         var downloadLocation = DownloadConfig.UseTempDir ? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()) : Path.Combine(downloadDir, name);
 
          progress?.Report(new ProgressData()
          {
