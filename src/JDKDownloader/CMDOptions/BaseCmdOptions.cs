@@ -22,7 +22,8 @@ namespace JDKDownloader.CMDOptions
       [Option('v', "verbose", HelpText = "More logs (for debugging)")]
       public bool Verbose { get; set; }
 
+      // Cast fails with InvalidCastExeception when using LogLeventLevel directly...
       [Option("loglevel", HelpText = "Log level (ignores all other log level options); Available: fatal, error, warning, information, debug or verbose")]
-      public LogEventLevel? LogLevel { get; set; } = null;
+      public string LogLevel { get; set; } = null;
    }
 }

@@ -96,7 +96,16 @@ namespace JDKDownloader
          var conf = GetDefaultLoggerConfiguration();
 
          if (baseCmdOptions.LogLevel != null)
-            conf = SetMinimumLevel(conf, baseCmdOptions.LogLevel.Value);
+         {
+            if (Enum.TryParse(baseCmdOptions.LogLevel, true, out LogEventLevel logEventLevel))
+            {
+               conf = SetMinimumLevel(conf, logEventLevel);
+            }
+            else
+            {
+               Log.Warn($"Failed to parse ${nameof(baseCmdOptions.LogLevel)}");
+            }
+         }
          else if (baseCmdOptions.Verbose)
             conf = conf.MinimumLevel.Debug();
          else if (baseCmdOptions.Errors)
