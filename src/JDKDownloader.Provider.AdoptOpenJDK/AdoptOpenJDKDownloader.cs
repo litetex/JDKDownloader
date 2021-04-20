@@ -305,6 +305,9 @@ namespace JDKDownloader.Provider.AdoptOpenJDK
          DirUtil.EnsureCreatedAndClean(outputdir);
 
          Log.Info($"Extracting '{packedFile}'->'{outputdir}'");
+
+         // We have to cut away the first layer in the compressed file,
+         // because it usually only contains 'jdk-11.0.10+9-jre\...' which isn't the java root directory
          if (packedFile.EndsWith(".zip"))
          {
             Log.Info("ExtractionMethod: ZIP");
