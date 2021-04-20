@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 
-    <PackageId>JDKDownloader.Base</PackageId>
+    <PackageId>Litetex.JDKDownloader.Base</PackageId>
     <Description>JDKDownloader - Base</Description>
     <Authors>litetex</Authors>
     <PackageProjectUrl>https://github.com/litetex/JDKDownloader</PackageProjectUrl>
