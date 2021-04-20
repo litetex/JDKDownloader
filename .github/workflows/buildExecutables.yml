@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      max-parallel: 4
+      max-parallel: 3
       matrix:
         # https://docs.microsoft.com/en-us/dotnet/core/rid-catalog
         # https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.NETCore.Platforms/src/runtime.json
@@ -32,7 +32,8 @@ jobs:
           - linux-arm64
           # ...
           - osx-x64
-          - osx-arm64
+          # Coming soon
+          # - osx-arm64
         configuration: [Release]
         project: [JDKDownloader]
     
