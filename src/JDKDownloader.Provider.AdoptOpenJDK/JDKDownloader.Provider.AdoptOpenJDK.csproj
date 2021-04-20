@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 
-    <PackageId>JDKDownloader.Provider.AdoptOpenJDK</PackageId>
+    <PackageId>Litetex.JDKDownloader.Provider.AdoptOpenJDK</PackageId>
     <Description>JDKDownloader - Provider: AdoptOpenJDK</Description>
     <Authors>litetex</Authors>
     <PackageProjectUrl>https://github.com/litetex/JDKDownloader</PackageProjectUrl>
