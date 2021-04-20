@@ -1,7 +1,7 @@
 # JDKDownloader <img src="assets/JDKD-128.png" height="50" /> [![Latest Version](https://img.shields.io/github/v/release/litetex/JDKDownloader?style=flat-square)](https://github.com/litetex/JDKDownloader/releases)
 ⚠ The project is in an experimental stage and not stable ⚠
 
-Downloads jdks/jres
+Download java
 
 ### Why don't just download Java via the API of the provider directly?
 This is technially possible and also a very good solution.
