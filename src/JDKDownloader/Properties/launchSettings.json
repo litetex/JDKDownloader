@@ -3,6 +3,10 @@
     "JDKDownloader": {
       "commandName": "Project",
       "commandLineArgs": "download adoptopenjdk --imagetype=jre --loglevel=warning"
+    },
+    "JDKDownloader - LINUX": {
+      "commandName": "Project",
+      "commandLineArgs": "download adoptopenjdk --imagetype=jre --os=linux"
     }
   }
 }
