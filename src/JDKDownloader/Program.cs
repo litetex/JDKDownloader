@@ -1,7 +1,6 @@
 ﻿using CommandLine;
 using JDKDownloader.CMDOptions;
 using JDKDownloader.CMDOptions.Download;
-using JDKDownloader.Core;
 using JDKDownloader.Provider;
 using JDKDownloader.Provider.AdoptOpenJDK;
 using Serilog;
@@ -136,7 +135,7 @@ namespace JDKDownloader
          var downloadConfig = new DownloadConfig()
          {
             PerformCheckSumCheck = !downloadOptions.NoCheckSumCheck,
-            UseTempDir = downloadOptions.UseTempDir
+            UseSystemTempDir = !downloadOptions.NotUseSystemTempDir
          };
          if(!string.IsNullOrWhiteSpace(downloadOptions.OutputDir))
             downloadConfig.OutputDir = downloadOptions.OutputDir;
