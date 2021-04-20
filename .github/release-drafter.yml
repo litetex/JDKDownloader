@@ -17,3 +17,10 @@ template: |
   ## Changes
   
   $CHANGES
+  
+  ## Nuget-Downloads
+  | Module | Nuget | 
+  | ------ | -------------- | 
+  | Base | [![Nuget](https://img.shields.io/badge/nuget-$RESOLVED_VERSION-informational)](https://www.nuget.org/packages/Litetex.JDKDownloader.Base/$RESOLVED_VERSION)|
+  | Provider.AdoptOpenJDK | [![Nuget](https://img.shields.io/badge/nuget-$RESOLVED_VERSION-informational)](https://www.nuget.org/packages/Litetex.JDKDownloader.Provider.AdoptOpenJDK/$RESOLVED_VERSION)|
+  
