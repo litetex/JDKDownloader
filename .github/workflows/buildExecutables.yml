@@ -16,18 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      max-parallel: 3
+      max-parallel: 4
       matrix:
         # https://docs.microsoft.com/en-us/dotnet/core/rid-catalog
         # https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.NETCore.Platforms/src/runtime.json
         os: 
-          # Windows 64 bit - most users in the world run that
+          # Windows 64 bit - most users run that
           - win-x64
-          # Linux 64 bit - most servers in the world run that
+          # Linux 64 bit - most servers run that
           - linux-x64
           # Linux Musl 64 bit (for alpine linux) - most container images should have that
           - linux-musl-x64
-          # Linux ARM 64 bit - most IoT devices (Rasperry Pi) run that (or ARM 32 bit)
+          # Linux ARM 64/32 bit - most IoT devices (Rasperry Pi) run that
           - linux-arm
           - linux-arm64
           # ...
@@ -46,12 +46,14 @@ jobs:
         
     - name: Publish ${{ matrix.os }} ${{ matrix.configuration }} - dotnet publish 
       working-directory: src/${{ matrix.project }}
-      run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.os }} /p:PublishSingleFile=true
+      # New in NET5: PublishSingleFile procudces more than one file... 
+      # (IncludeNativeLibrariesForSelfExtract fixes that, https://github.com/dotnet/runtime/issues/36590#issuecomment-699257013)
+      run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.os }} -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true
 
       #Ignore pdb files
     - name: Pack ${{ matrix.os }} - Zip
       working-directory: src/${{ matrix.project }}/bin/${{ matrix.configuration }}/net5.0/${{ matrix.os }}/publish/
-      run: zip -r ${{ matrix.project }}.zip . -x \*.pdb
+      run: zip -r ${{ matrix.project }}.zip .
 
     - name: Upload ${{ matrix.os }} - Upload Artifact
       uses: actions/upload-artifact@v2
