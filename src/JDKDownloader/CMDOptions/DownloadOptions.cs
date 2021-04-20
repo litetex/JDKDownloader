@@ -13,7 +13,7 @@ namespace JDKDownloader.CMDOptions
       [Value(0)]
       public IEnumerable<string> SubArgs { get; set; }
 
-      [Option('o', "outputdirectory", HelpText = "Specifies the output directory; if not set = current working directory")]
+      [Option('o', "outputdirectory", HelpText = "Specifies the output directory; if not set = current working directory + \"java\"")]
       public string OutputDir { get; set; }
 
       [Option("noCheckSumCheck", HelpText = "Perform NO checksum check against the remote server; Be careful")]
