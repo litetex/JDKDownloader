@@ -1,4 +1,4 @@
-# JDKDownloader
+# JDKDownloader [![Latest Version](https://img.shields.io/github/v/release/litetex/JDKDownloader?style=flat-square)](https://github.com/litetex/JDKDownloader/releases)
 ⚠ The project is in an experimental stage and not stable ⚠
 
 Downloads jdks/jres
