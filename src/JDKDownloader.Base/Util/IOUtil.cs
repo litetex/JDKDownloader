@@ -15,21 +15,5 @@ namespace JDKDownloader.Base.Util
          foreach (FileInfo file in source.GetFiles())
             file.CopyTo(Path.Combine(target.FullName, file.Name), overwrite);
       }
-
-      public static string GenerateTempDir(string requestedTempDir)
-      {
-         var tempDir = requestedTempDir;
-         if (tempDir == null)
-         {
-            tempDir = Path.GetTempFileName();
-            File.Delete(tempDir);
-         }
-         else
-         {
-            tempDir = Path.Combine(tempDir, Path.GetRandomFileName());
-         }
-         DirUtil.EnsureCreatedAndClean(tempDir);
-         return tempDir;
-      }
    }
 }
