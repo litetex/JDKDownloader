@@ -135,7 +135,7 @@ namespace JDKDownloader
          var downloadConfig = new DownloadConfig()
          {
             PerformCheckSumCheck = !downloadOptions.NoCheckSumCheck,
-            UseTempDir = downloadOptions.UseTempDir
+            UseSystemTempDir = !downloadOptions.NotUseSystemTempDir
          };
          if(!string.IsNullOrWhiteSpace(downloadOptions.OutputDir))
             downloadConfig.OutputDir = downloadOptions.OutputDir;
