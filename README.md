@@ -7,7 +7,7 @@ Downloads jdks/jres
 This is technially possible and also a very good solution.
 
 However there are some problems:
-1. Automatically resolving OS and Architecture is not that easily possible. 
+1. Automatically resolving OS and Architecture is not that easily possible on different operating systems.<br>
 This would require a lot of ``if`` statements and is also dependent on the platform (Windows → ``batch or powershell`` | Linux → ``shell``)
 2. Configuration may differ a lot between providers
 3. You get a compressed file (usually ``zip`` or ``tar.gz``), that has to be extracted (you need some kind of compression tool).
