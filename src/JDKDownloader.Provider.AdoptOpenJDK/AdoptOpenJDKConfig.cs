@@ -8,7 +8,7 @@ using System.Text;
 namespace JDKDownloader.Provider.AdoptOpenJDK
 {
    /// <summary>
-   /// Configuration for <see cref="AdoptOpenJDKProvider"/> <seealso cref="https://api.adoptopenjdk.net/swagger-ui/#/Assets/get_v3_assets_feature_releases__feature_version___release_type_"/>
+   /// Configuration for <see cref="AdoptOpenJDKProvider"/> <seealso cref="https://api.adoptopenjdk.net/q/swagger-ui/#/Assets/searchReleases"/>
    /// </summary>
    public class AdoptOpenJDKConfig : IJdkProviderConfig
    {
