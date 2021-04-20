@@ -47,8 +47,6 @@ namespace JDKDownloader
             {
                try
                {
-                  ConsoleController.TryShowConsole();
-
                   if (ev?.ExceptionObject is Exception ex)
                   {
                      Log.Fatal("An unhandled error occured", ex);
@@ -88,7 +86,6 @@ namespace JDKDownloader
          }
          catch (Exception ex)
          {
-            ConsoleController.TryShowConsole();
             Log.Fatal(ex);
          }
 #endif
