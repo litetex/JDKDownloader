@@ -83,7 +83,7 @@ jobs:
       run: zip -r ${{ matrix.project }}.zip .
 
     - name: Release ${{ matrix.os }} - Upload Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -128,7 +128,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload nupkg - Upload release asset
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -150,7 +150,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload snupkg - Upload release asset
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
