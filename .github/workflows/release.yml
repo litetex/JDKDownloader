@@ -12,7 +12,7 @@ jobs:
        version: ${{ steps.create_version.outputs.version }}
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -65,7 +65,7 @@ jobs:
         project: [JDKDownloader]
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -103,7 +103,7 @@ jobs:
         - "JDKDownloader.Provider.AdoptOpenJDK"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
